@@ -14,11 +14,19 @@
       width: 100%;
     }
 
-    #startBtn {
+    .contenedor-texto {
       position: absolute;
-      top: 20px;
+      top: 30px;
       left: 50%;
       transform: translateX(-50%);
+      text-align: center;
+      color: white;
+      z-index: 10;
+      font-family: sans-serif;
+    }
+
+    #startBtn {
+      margin-top: 10px;
       padding: 0.7rem 1.4rem;
       background: #ff4d6d;
       color: white;
@@ -26,7 +34,6 @@
       border-radius: 30px;
       font-size: 1rem;
       box-shadow: 0 0 10px #ff4d6d;
-      z-index: 10;
       cursor: pointer;
     }
 
@@ -51,8 +58,10 @@
   </style>
 </head>
 <body>
-   <h1>❤️ LA BELLEZA NO SE ESCONDE ❤️</h1>
-  <button id="startBtn">Ver la belleza</button>
+  <div class="contenedor-texto">
+    <h1>❤️ LA BELLEZA NO SE ESCONDE ❤️</h1>
+    <button id="startBtn">Ver la belleza</button>
+  </div>
 
   <script>
     const totalFotos = 17;
@@ -62,10 +71,7 @@
     function corazon(t, escala) {
       const x = escala * 16 * Math.pow(Math.sin(t), 3);
       const y = -escala * (
-        13 * Math.cos(t) -
-        5 * Math.cos(2 * t) -
-        2 * Math.cos(3 * t) -
-        Math.cos(4 * t)
+        13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)
       );
       return { x, y };
     }
