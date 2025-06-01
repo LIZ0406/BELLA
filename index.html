@@ -2,73 +2,79 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Corazón Adaptativo con Fotos Grandes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Corazón con Fotos Adaptado a Celular</title>
   <style>
     body {
       margin: 0;
-      height: 100vh;
-      background: radial-gradient(circle at center, #1a0000 0%, #000000 80%);
+      padding: 0;
       overflow: hidden;
+      background: radial-gradient(circle at center, #1a0000, #000);
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #ff4d6d;
-      user-select: none;
+      height: 100vh;
       position: relative;
+      color: #fff;
     }
-    h1 {
-      margin: 1rem 0 0.5rem;
+
+    h1, p {
+      text-align: center;
+      z-index: 10;
       text-shadow: 0 0 15px #ff4d6d;
-      z-index: 10;
     }
+
+    h1 {
+      font-size: clamp(1.5rem, 5vw, 2.5rem);
+      margin: 1rem 0 0.3rem;
+    }
+
     p {
-      margin: 0 0 1.5rem 0;
-      font-size: 1.2rem;
-      text-shadow: 0 0 10px #ff4d6d;
-      z-index: 10;
+      font-size: clamp(1rem, 4vw, 1.3rem);
+      margin: 0 0 1.5rem;
     }
+
     button {
-      padding: 1rem 2rem;
+      padding: 0.8rem 1.8rem;
       font-size: 1.2rem;
       background: #ff4d6d;
+      color: white;
       border: none;
       border-radius: 30px;
-      color: white;
-      cursor: pointer;
       box-shadow: 0 0 20px #ff4d6d;
+      cursor: pointer;
+      z-index: 10;
       transition: transform 0.3s ease;
       margin-bottom: 2rem;
-      z-index: 10;
     }
+
     button:hover {
       transform: scale(1.1);
     }
+
     img.foto {
       position: absolute;
       border-radius: 15px;
-      box-shadow: 0 0 20px #ff4d6d;
+      box-shadow: 0 0 10px #ff4d6d;
       pointer-events: none;
       user-select: none;
-      will-change: transform, left, top;
       transition: width 0.3s ease;
     }
   </style>
 </head>
 <body>
-  <h1>❤️ LA BELLEZA NO SE ESCONDE ❤️</h1>
-  <p>Haz click para iniciar la belleza</p>
-  <button id="startBtn">Ver la belleza</button>
+  <h1>❤️ Para Ti ❤️</h1>
+  <p>Haz clic para ver la magia</p>
+  <button id="startBtn">Iniciar Animación</button>
 
   <script>
-    const cantidadFotos = 17;
+    const totalFotos = 17;
     const fotos = [];
+    const velocidadGlobal = 0.0025;
     let animationId;
-    const velocidadComun = 0.0025; // velocidad fija para todas
 
-    // Ecuación paramétrica para forma de corazón
     function corazon(t, escala) {
       const x = escala * 16 * Math.pow(Math.sin(t), 3);
       const y = -escala * (
@@ -80,72 +86,59 @@
       return { x, y };
     }
 
-    function iniciarAnimacion() {
-      const btn = document.getElementById('startBtn');
-      btn.style.display = 'none';
+    function iniciar() {
+      document.getElementById("startBtn").style.display = "none";
 
-      function actualizarEscala() {
-        const centerX = window.innerWidth / 2;
-        const centerY = window.innerHeight / 2;
-        const escala = Math.min(centerX, centerY) / 14; // un poco más pequeño
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      const escala = Math.min(centerX, centerY) / 12;
 
-        fotos.forEach((foto, i) => {
-          foto.escala = escala;
-          const baseWidth = escala * 4;
-          const width = Math.min(Math.max(baseWidth + Math.random() * 20, 80), 120);
-          foto.el.style.width = `${width}px`;
+      for (let i = 0; i < totalFotos; i++) {
+        const img = document.createElement("img");
+        img.src = `img/${i + 1}.jpg`;
+        img.classList.add("foto");
+        img.style.width = `${Math.max(60, escala * 2)}px`;
+        document.body.appendChild(img);
+
+        fotos.push({
+          el: img,
+          t: (i / totalFotos) * 2 * Math.PI,
+          escala: escala,
+          oscilacion: Math.random() * 4 + 1.5,
         });
-
-        return { centerX, centerY };
       }
 
-      if(fotos.length === 0){
-        for(let i = 0; i < cantidadFotos; i++) {
-          const img = document.createElement('img');
-          img.src = `img/${i + 1}.jpg`;
-          img.classList.add('foto');
-          document.body.appendChild(img);
+      animar();
+    }
 
-          const tInit = (i / cantidadFotos) * 2 * Math.PI;
+    function animar(time) {
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
 
-          fotos.push({
-            el: img,
-            t: tInit,
-            velocidad: velocidadComun,  // velocidad fija
-            oscilacion: Math.random() * 5 + 2,
-            escala: 0,
-          });
-        }
-      }
+      fotos.forEach(foto => {
+        foto.t += velocidadGlobal;
+        if (foto.t > 2 * Math.PI) foto.t -= 2 * Math.PI;
 
-      let centerX, centerY;
+        const pos = corazon(foto.t, foto.escala);
+        const x = centerX + pos.x - foto.el.width / 2;
+        const y = centerY + pos.y + Math.sin(time * 0.005 + foto.t * 10) * foto.oscilacion - foto.el.height / 2;
 
-      function animar(time) {
-        ({centerX, centerY} = actualizarEscala());
-
-        fotos.forEach(foto => {
-          foto.t += foto.velocidad;
-          if (foto.t > 2 * Math.PI) foto.t -= 2 * Math.PI;
-
-          const pos = corazon(foto.t, foto.escala);
-          const oscilacionY = Math.sin(time * 0.005 + foto.t * 10) * foto.oscilacion;
-
-          const x = centerX + pos.x - foto.el.width / 2;
-          const y = centerY + pos.y + oscilacionY - foto.el.height / 2;
-
-          foto.el.style.left = `${x}px`;
-          foto.el.style.top = `${y}px`;
-
-          foto.el.style.transform = `rotate(${foto.t * 180 / Math.PI}deg)`;
-        });
-
-        animationId = requestAnimationFrame(animar);
-      }
+        foto.el.style.left = `${x}px`;
+        foto.el.style.top = `${y}px`;
+        foto.el.style.transform = `rotate(${foto.t * 180 / Math.PI}deg)`;
+      });
 
       animationId = requestAnimationFrame(animar);
     }
 
-    document.getElementById('startBtn').addEventListener('click', iniciarAnimacion);
+    document.getElementById("startBtn").addEventListener("click", iniciar);
+
+    // Adaptarse al tamaño de la pantalla
+    window.addEventListener("resize", () => {
+      fotos.forEach(f => {
+        f.escala = Math.min(window.innerWidth, window.innerHeight) / 12;
+      });
+    });
   </script>
 </body>
 </html>
